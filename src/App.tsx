@@ -415,7 +415,7 @@ function App() {
             </div>
           ))}
         </div>
-        <div className="xxs:w-[484px] grid h-[198px] w-[360px] grid-rows-3 gap-[8px]">
+        <div className="xxs:w-[484px] xxs:h-[198px] grid h-[180px] w-[360px] grid-rows-3 gap-[8px]">
           {NumOfKeysAndOffset.map((row, rowIndex) => (
             <div
               key={rowIndex}
