@@ -433,7 +433,7 @@ function App() {
           <TbMeterCube
             color="#538D4E"
             size={"2rem"}
-            className="absolute bottom-0 right-[-12%]"
+            className="phone:right-[-12%] phone:bottom-0 absolute bottom-[-5%] right-[-16%]"
           />
         </a>
         <label

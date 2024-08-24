@@ -45,7 +45,7 @@ export default function Panel({
               &#10006;
             </button>
             <div className="phone:justify-center row-span-1 flex items-center justify-start bg-[#d7d7d7]">
-              <span className="phone:text-[2.2rem] relative text-[1.5rem] font-bold md:text-[2.5rem]">
+              <span className="phone:text-[2.2rem] phone:ml-0 relative ml-6 text-[1.5rem] font-bold md:text-[2.5rem]">
                 Wordle Clone
                 <TbMeterCube
                   color="#538D4E"
