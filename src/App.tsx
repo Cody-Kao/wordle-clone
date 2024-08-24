@@ -328,10 +328,10 @@ function App() {
         setLatestWinRow(-1);
         setDisplayPanel(true);
       } else {
-        setCurAnswerRow((curRow) => curRow + 1);
         setCurAnswerCol(0);
         setIsRunning(false);
       }
+      setCurAnswerRow((curRow) => curRow + 1);
     }, 2000);
   };
 
@@ -477,7 +477,6 @@ function App() {
                     "inner col-span-1 border-2 border-[#ccc] text-[2rem] font-bold",
                     valueStatePair[0] != -1 &&
                       curAnswerRow == rowIndex &&
-                      !isGameOver &&
                       "pop border-[#000]",
                     rowIndex < curAnswerRow && "flip",
                   )}
