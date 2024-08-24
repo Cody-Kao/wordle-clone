@@ -8,12 +8,15 @@ import {
 import { twMerge } from "tailwind-merge";
 import { IoBackspaceOutline } from "react-icons/io5";
 import { FiExternalLink } from "react-icons/fi";
+import { TbMeterCube } from "react-icons/tb";
+import { PiRankingDuotone } from "react-icons/pi";
 import { KeyType } from "./Types/type";
 // 要先安裝 "npm install vite-plugin-raw --save-dev" 再把路徑最後加上"?raw" 完成本地assets file import
 import guessWordlist from "./assets/wordle-La.txt?raw";
 import allowedGuessWordlist from "./assets/wordle-Ta.txt?raw";
 import Alarm from "./Componenets/Alarm.tsx";
 import useLocalStorage from "./Hooks/useLocalStorage.tsx";
+import Panel from "./Componenets/Panel.tsx";
 
 function App() {
   const [isGameOver, setIsGameOver] = useLocalStorage("isGameOver", false);
@@ -30,10 +33,46 @@ function App() {
 
   const [answer, setAnswer] = useLocalStorage<string>("answer", "");
 
+  const [displayPanel, setDisplayPanel] = useState(false);
+  // number of games played
+  const [numOfPlayedGames, setNumOfPlayedGames] = useLocalStorage(
+    "numOfPlayedGames",
+    0,
+  );
+  // number of winning games
+  const [numOfWinGames, setNumOfWinGames] = useLocalStorage("numOfWinGames", 0);
+  // number of current streak
+  const [numOfCurrentStreak, setNumOfCurrentStreak] = useLocalStorage(
+    "numOfCurrentStreak",
+    0,
+  );
+  // number of max streak
+  const [numOfMaxStreak, setNumOfMaxStreak] = useLocalStorage(
+    "numOfMaxStreak",
+    0,
+  );
+  // lastest wining row
+  const [latestWinRow, setLatestWinRow] = useLocalStorage("latestWinRow", -1);
+  // every row's winning record
+  const [winRecordOfRows, setWinRecordOfRows] = useLocalStorage<number[]>(
+    "winRecordOfRows",
+    [0, 0, 0, 0, 0, 0],
+  );
+
   const [currentDate, setCurrentDate] = useLocalStorage<string>(
     "currentDate",
     "",
   );
+
+  const hashCode = (str: string): number => {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = (hash << 5) - hash + char;
+      hash |= 0; // Convert to 32bit integer
+    }
+    return Math.abs(hash);
+  };
 
   useEffect(() => {
     const today = new Date().toISOString().split("T")[0];
@@ -41,7 +80,7 @@ function App() {
       // update the date and answer
       setCurrentDate(today);
       setAnswer(() => {
-        const index = Math.floor(new Date().getTime() / (24 * 60 * 60 * 1000));
+        const index = hashCode(today + "-$"); // -$ is the salt to provide randomness
         const newAnswer =
           guessWordlistRef.current[index % guessWordlistRef.current.length];
         return newAnswer;
@@ -74,7 +113,7 @@ function App() {
 
   const [isRunning, setIsRunning] = useState(false);
 
-  const [display, setDisplay] = useState(false);
+  const [displayAlarm, setDisplayAlarm] = useState(false);
 
   const [alarmContent, setAlarmContent] = useState("");
 
@@ -142,11 +181,11 @@ function App() {
 
     // Set new alarm content and display it
     setAlarmContent(content);
-    setDisplay(true);
+    setDisplayAlarm(true);
 
     // Set a new timeout to hide the alarm after 2 seconds
     timeoutRef.current = setTimeout(() => {
-      setDisplay(false);
+      setDisplayAlarm(false);
     }, 2000);
   };
 
@@ -251,14 +290,6 @@ function App() {
         );
       }
 
-      setCurAnswerRow((curRow) => {
-        if (curRow == 5) {
-          setIsGameOver(true); // 若6次機會用完遊戲就結束
-        }
-        return curRow + 1;
-      });
-      setCurAnswerCol(0);
-      setIsRunning(false);
       // 把數字加起來看看是否等於10 是的話就全對
       if (result.reduce((num, cur) => num + cur, 0) == 10) {
         setIsGameOver(true);
@@ -268,6 +299,38 @@ function App() {
             letter.classList.add("bounce");
           }, letterIndex * 300);
         }
+        setTimeout(() => {
+          setNumOfCurrentStreak((curStreak) => {
+            setNumOfMaxStreak((maxStreak) =>
+              Math.max(maxStreak, curStreak + 1),
+            );
+            return curStreak + 1;
+          });
+          setNumOfWinGames((winGames) => winGames + 1);
+          setNumOfPlayedGames((playedGames) => playedGames + 1);
+          setLatestWinRow(curAnswerRow);
+          setWinRecordOfRows((rows) =>
+            rows.map((row, rowIndex) => {
+              if (rowIndex == curAnswerRow) {
+                return row + 1;
+              } else {
+                return row;
+              }
+            }),
+          );
+          setDisplayPanel(true);
+        }, 1800);
+      } else if (curAnswerRow == 5) {
+        // 6次機會用完都沒答對
+        setIsGameOver(true);
+        setNumOfCurrentStreak(0);
+        setNumOfPlayedGames((playedGames) => playedGames + 1);
+        setLatestWinRow(-1);
+        setDisplayPanel(true);
+      } else {
+        setCurAnswerRow((curRow) => curRow + 1);
+        setCurAnswerCol(0);
+        setIsRunning(false);
       }
     }, 2000);
   };
@@ -345,17 +408,45 @@ function App() {
   ]);
 
   return (
-    <div className="grid h-screen w-screen grid-rows-11 bg-[#fff]">
-      <div className="xs:flex absolute bottom-2 right-8 hidden flex-col items-center justify-center gap-0">
+    <div className="relative grid h-screen w-screen grid-rows-11 bg-[#fff]">
+      <Panel
+        display={displayPanel}
+        closePanelFunction={() => setDisplayPanel(false)}
+        data={{
+          numOfPlayedGames: numOfPlayedGames,
+          numOfWinGames: numOfWinGames,
+          numOfCurrentStreak: numOfCurrentStreak,
+          numOfMaxStreak: numOfMaxStreak,
+          latestWinRow: latestWinRow,
+          winRecordOfRows: winRecordOfRows,
+        }}
+      />
+      <div className="absolute bottom-2 right-8 hidden flex-col items-center justify-center gap-0 xs:flex">
         <span>網頁時間</span>
         <span className="font-bold">{currentDate}</span>
       </div>
       <div className="relative row-span-1 flex w-screen items-center border-b border-[#ddd] bg-[#fff] p-0">
-        <a href="/">
+        <a href="/" className="relative">
           <h1 className="ml-2 cursor-pointer text-[2rem] font-bold text-[#000]">
             Wordle Clone
           </h1>
+          <TbMeterCube
+            color="#538D4E"
+            size={"2rem"}
+            className="absolute bottom-0 right-[-12%]"
+          />
         </a>
+        <label
+          htmlFor="displayPanelBtn"
+          className="ml-auto mr-[20%] cursor-pointer"
+        >
+          <PiRankingDuotone size={"2rem"} />
+        </label>
+        <button
+          id="displayPanelBtn"
+          className="hidden"
+          onClick={() => setDisplayPanel(true)}
+        ></button>
         <label>
           <a
             href="https://www.nytimes.com/games/wordle/index.html"
@@ -364,12 +455,12 @@ function App() {
             className="absolute right-8 inline-block justify-self-end text-[1rem] hover:underline"
           >
             Wordle
-            <FiExternalLink className="absolute bottom-0 right-[-.8rem] text-[.9rem]" />
+            <FiExternalLink className="absolute bottom-0 right-[-0.8rem] text-[.9rem]" />
           </a>
         </label>
       </div>
       <div className="relative row-span-10 flex w-screen flex-col items-center">
-        <Alarm content={alarmContent} display={display} />
+        <Alarm content={alarmContent} display={displayAlarm} />
         <div
           className="grid h-[360px] w-[300px] grid-rows-6 gap-[5px] p-[10px]"
           ref={answerAreaRef}
@@ -415,7 +506,7 @@ function App() {
             </div>
           ))}
         </div>
-        <div className="xxs:w-[484px] xxs:h-[198px] grid h-[180px] w-[360px] grid-rows-3 gap-[8px]">
+        <div className="grid h-[180px] w-[360px] grid-rows-3 gap-[8px] xxs:h-[198px] xxs:w-[484px]">
           {NumOfKeysAndOffset.map((row, rowIndex) => (
             <div
               key={rowIndex}

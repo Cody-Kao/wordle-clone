@@ -2,8 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 :root {
+  height: 100vh;
+  width: 100vh;
   font-family: Poppins, sans-serif;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 @keyframes horizontal-shaking {
@@ -148,4 +151,35 @@
 /* Style the back side */
 .back {
   transform: rotateX(180deg);
+}
+
+/* for panel sliding animation */
+@keyframes slideInFromTop {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutToTop {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+}
+
+.slide-in {
+  animation: slideInFromTop 0.5s forwards;
+}
+
+.slide-out {
+  animation: slideOutToTop 0.5s forwards;
 }

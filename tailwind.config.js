@@ -7,6 +7,7 @@ export default {
         xs: "890px",
         // => @media (min-width: 890px) { ... }
         xxs: "500px",
+        phone: "400px",
       },
     },
   },
