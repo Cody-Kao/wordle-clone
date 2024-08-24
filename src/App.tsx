@@ -427,7 +427,7 @@ function App() {
       </div>
       <div className="relative row-span-1 flex w-screen items-center border-b border-[#ddd] bg-[#fff] p-0">
         <a href="/" className="relative">
-          <h1 className="ml-2 cursor-pointer text-[2rem] font-bold text-[#000]">
+          <h1 className="phone:text-[2rem] ml-2 cursor-pointer text-[1.5rem] font-bold text-[#000]">
             Wordle Clone
           </h1>
           <TbMeterCube
@@ -438,7 +438,7 @@ function App() {
         </a>
         <label
           htmlFor="displayPanelBtn"
-          className="ml-auto mr-[20%] cursor-pointer"
+          className="ml-auto mr-[25%] cursor-pointer"
         >
           <PiRankingDuotone size={"2rem"} />
         </label>

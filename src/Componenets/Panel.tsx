@@ -44,7 +44,7 @@ export default function Panel({
             >
               &#10006;
             </button>
-            <div className="row-span-1 flex items-center justify-center bg-[#d7d7d7]">
+            <div className="phone:justify-center row-span-1 flex items-center justify-start bg-[#d7d7d7]">
               <span className="phone:text-[2.2rem] relative text-[1.5rem] font-bold md:text-[2.5rem]">
                 Wordle Clone
                 <TbMeterCube
@@ -92,7 +92,7 @@ export default function Panel({
               {/* for loop */}
               {data.winRecordOfRows.map((winGames, rowIndex) => (
                 <div className="flex h-[10%] w-[70%]" key={rowIndex}>
-                  <div className="h-[100%] w-[10%] bg-[#000] text-center align-middle text-[#fff]">
+                  <div className="phone:text-[1rem] h-[100%] w-[10%] bg-[#000] text-center align-middle text-[.8rem] text-[#fff]">
                     {rowIndex + 1}
                   </div>
                   <div
