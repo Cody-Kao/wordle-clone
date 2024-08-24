@@ -477,6 +477,7 @@ function App() {
                     "inner col-span-1 border-2 border-[#ccc] text-[2rem] font-bold",
                     valueStatePair[0] != -1 &&
                       curAnswerRow == rowIndex &&
+                      !isGameOver &&
                       "pop border-[#000]",
                     rowIndex < curAnswerRow && "flip",
                   )}
